@@ -13,11 +13,11 @@ app.post('/api/contacto', (req, res) => {
   const { nombre } = req.body;
   return res.json({
     éxito: true,
-    mensaje: `¡Gracias ${nombre}, mensaje recibido!`
+    mensaje: `¡Gracias ${nombre}, mensaje recibido!`,
   });
 });
 
 const PORT = 3000;
-app.listen(PORT, () =>
-  console.log(`🚀 Backend escuchando en puerto ${PORT}`)
-);
+app.listen(PORT, () => console.log(`🚀 Backend escuchando en puerto ${PORT}`));
+
+module.exports = app; // Exportamos la aplicación para pruebas
