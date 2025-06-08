@@ -9,8 +9,8 @@ pipeline {
     stages {
         stage('Verificar Docker') {
             steps {
-                sh 'docker --version'
-                sh 'docker ps'
+                bat 'docker --version'
+                bat 'docker ps'
             }
         }
         stage('Checkout') {
@@ -40,15 +40,15 @@ pipeline {
         stage('Run Tests Backend') {
             steps {
                 dir('Backend') {
-                    sh 'npm install'
-                    sh 'npm test'
+                    bat 'npm install'
+                    bat 'npm test'
                 }
             }
         }
         stage('Deploy') {
             steps {
                 // Aquí puedes hacer deploy, por ejemplo ejecutar docker-compose
-                sh 'docker-compose up -d'
+                bat 'docker-compose up -d'
             }
         }
     }
