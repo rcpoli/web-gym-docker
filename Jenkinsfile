@@ -2,32 +2,41 @@ pipeline {
     agent any
 
     environment {
+        // Variables para Docker (ajusta según tu configuración)
         DOCKER_IMAGE_NAME = 'web-gym-app'
     }
 
     stages {
+        stage('Verificar Docker') {
+            steps {
+                sh 'docker --version'
+                sh 'docker ps'
+            }
+        }
         stage('Checkout') {
             steps {
+                // Clonar el repositorio
                 git url: 'https://github.com/Juandarp96/web-gym-docker.git', branch: 'main'
             }
         }
-
         stage('Build Backend Docker Image') {
             steps {
                 dir('Backend') {
-                    sh "docker build -t ${DOCKER_IMAGE_NAME}-backend ."
+                    script {
+                        docker.build("${env.DOCKER_IMAGE_NAME}-backend", '-f Dockerfile.yml .')
+                    }
                 }
             }
         }
-
         stage('Build Frontend Docker Image') {
             steps {
                 dir('Frontend') {
-                    sh "docker build -t ${DOCKER_IMAGE_NAME}-frontend ."
+                    script {
+                        docker.build("${env.DOCKER_IMAGE_NAME}-frontend", '-f Dockerfile.yml .')
+                    }
                 }
             }
         }
-
         stage('Run Tests Backend') {
             steps {
                 dir('Backend') {
@@ -36,14 +45,13 @@ pipeline {
                 }
             }
         }
-
         stage('Deploy') {
             steps {
+                // Aquí puedes hacer deploy, por ejemplo ejecutar docker-compose
                 sh 'docker-compose up -d'
             }
         }
     }
-
     post {
         always {
             echo 'Pipeline finalizado'
