@@ -1,23 +1,18 @@
-const express = require('express');
-const cors = require('cors');
+const express = require("express");
 const app = express();
 
-app.use(cors());
 app.use(express.json());
 
-app.post('/api/contacto', (req, res) => {
-  // 1) Logueamos el body para ver en los logs del contenedor
-  console.log('Contacto entrante:', req.body);
-
-  // 2) Respondemos al frontend
-  const { nombre } = req.body;
-  return res.json({
-    éxito: true,
-    mensaje: `¡Gracias ${nombre}, mensaje recibido!`,
-  });
+app.post("/api/contacto", (req, res) => {
+  const contacto = req.body;
+  console.log("Contacto entrante:", contacto);
+  res.status(200).json({ mensaje: "Información de contacto recibida" });
 });
 
-const PORT = 3000;
-app.listen(PORT, () => console.log(`🚀 Backend escuchando en puerto ${PORT}`));
+// Solo iniciar el servidor si no estamos en pruebas
+if (process.env.NODE_ENV !== 'test') {
+  const PORT = 3000;
+  app.listen(PORT, () => console.log(`🚀 Backend escuchando en puerto ${PORT}`));
+}
 
-module.exports = app; // Exportamos la aplicación para pruebas
+module.exports = app;
