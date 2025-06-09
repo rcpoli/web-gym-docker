@@ -2,7 +2,8 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE_NAME = 'web-gym-app'
+        BACKEND_IMAGE = 'web-gym-app-backend'
+        FRONTEND_IMAGE = 'web-gym-app-frontend'
     }
 
     stages {
@@ -22,7 +23,7 @@ pipeline {
         stage('Build Backend Docker Image') {
             steps {
                 dir('Backend') {
-                    bat "docker build -t %DOCKER_IMAGE_NAME%-backend -f Dockerfile ."
+                    bat "docker build -t ${BACKEND_IMAGE} ."
                 }
             }
         }
@@ -30,7 +31,7 @@ pipeline {
         stage('Build Frontend Docker Image') {
             steps {
                 dir('Frontend') {
-                    bat "docker build -t %DOCKER_IMAGE_NAME%-frontend -f Dockerfile ."
+                    bat "docker build -t ${FRONTEND_IMAGE} ."
                 }
             }
         }
@@ -38,15 +39,16 @@ pipeline {
         stage('Run Tests Backend') {
             steps {
                 dir('Backend') {
-                    bat 'npm install'
-                    bat 'npm test'
+                    bat """
+                    docker run --rm ${BACKEND_IMAGE} npm test
+                    """
                 }
             }
         }
 
         stage('Deploy') {
             steps {
-                bat 'docker-compose up -d'
+                echo 'Desplegando aplicación... (aquí irían comandos de despliegue reales)'
             }
         }
     }
@@ -54,9 +56,6 @@ pipeline {
     post {
         always {
             echo 'Pipeline finalizado'
-        }
-        success {
-            echo '¡Build y tests exitosos!'
         }
         failure {
             echo 'Falló el pipeline'
