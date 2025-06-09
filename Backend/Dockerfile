@@ -12,4 +12,4 @@ RUN npm install
 EXPOSE 3000
 
 # Comando por defecto para producción
-CMD ["node", "app.js"]
+CMD ["node", "server.js"]
