@@ -1,3 +1,6 @@
+<<<<<<< HEAD
+[copiar el contenido del README de main arriba] 
+=======
 
 # Web Gym - Solo Frontend
 
@@ -30,3 +33,4 @@ Incluye:
 
 
 ---
+>>>>>>> main
