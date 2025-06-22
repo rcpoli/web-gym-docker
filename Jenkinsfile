@@ -48,29 +48,30 @@ pipeline {
 
         stage('Deploy to GitHub Pages') {
             steps {
-                dir('Frontend') {
-                    withCredentials([usernamePassword(credentialsId: 'rcpoli-github-test', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_TOKEN')]) {
-                        bat '''
-                        :: Configure Git
-                        git config --global user.email "jenkins@local"
-                        git config --global user.name "%GIT_USER%"
+                withCredentials([usernamePassword(credentialsId: 'github-creds', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_TOKEN')]) {
+                    bat '''
+                    :: Define safe working folder
+                    cd %WORKSPACE%
+                    if exist deploy-temp rmdir /S /Q deploy-temp
 
-                        :: Clone gh-pages branch to temp folder
-                        git clone --branch gh-pages https://%GIT_USER%:%GIT_TOKEN%@github.com/rcpoli/web-gym-docker.git gh-pages
+                    :: Clone gh-pages into deploy-temp
+                    git clone --branch gh-pages https://%GIT_USER%:%GIT_TOKEN%@github.com/rcpoli/web-gym-docker.git deploy-temp
 
-                        :: Delete existing content in gh-pages
-                        del /Q /S gh-pages\\*
+                    :: Clear old contents (except .git)
+                    cd deploy-temp
+                    for /D %%D in (*) do if /I not "%%D"==".git" rmdir /S /Q "%%D"
+                    for %%F in (*) do if /I not "%%F"==".git" del /Q "%%F"
 
-                        :: Copy static files into gh-pages
-                        xcopy /E /Y /I * gh-pages\\
+                    :: Copy frontend static files into deploy-temp
+                    xcopy /E /Y /I "%WORKSPACE%\\Frontend\\*" .
 
-                        :: Commit and push
-                        cd gh-pages
-                        git add .
-                        git commit -m "Deploy static site from Jenkins"
-                        git push origin gh-pages
-                        '''
-                    }
+                    :: Commit and push
+                    git config user.email "jenkins@local"
+                    git config user.name "%GIT_USER%"
+                    git add .
+                    git commit -m "Deploy static site from Jenkins" || echo Nothing to commit
+                    git push origin gh-pages
+                    '''
                 }
             }
         }
