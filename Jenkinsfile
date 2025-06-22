@@ -16,7 +16,7 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git url: 'https://github.com/Juandarp96/web-gym-docker.git', branch: 'main'
+                git url: 'https://github.com/rcpoli/web-gym-docker.git', branch: 'main'
             }
         }
 
@@ -46,9 +46,35 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
+        stage('Deploy to GitHub Pages') {
+            when {
+                branch 'main'
+            }
             steps {
-                echo 'Desplegando aplicación... (aquí irían comandos de despliegue reales)'
+                dir('Frontend') {
+                    withCredentials([usernamePassword(credentialsId: 'github-creds', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_TOKEN')]) {
+                        bat '''
+                        :: Configure Git
+                        git config --global user.email "jenkins@local"
+                        git config --global user.name "%GIT_USER%"
+
+                        :: Clone gh-pages branch to temp folder
+                        git clone --branch gh-pages https://%GIT_USER%:%GIT_TOKEN%@github.com/rcpoli/web-gym-docker.git gh-pages
+
+                        :: Delete existing content in gh-pages
+                        del /Q /S gh-pages\\*
+
+                        :: Copy static files into gh-pages
+                        xcopy /E /Y /I * gh-pages\\
+
+                        :: Commit and push
+                        cd gh-pages
+                        git add .
+                        git commit -m "Deploy static site from Jenkins"
+                        git push origin gh-pages
+                        '''
+                    }
+                }
             }
         }
     }
