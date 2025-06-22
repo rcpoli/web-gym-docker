@@ -48,24 +48,24 @@ pipeline {
 
         stage('Deploy to GitHub Pages') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'github-creds', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_TOKEN')]) {
+                withCredentials([usernamePassword(credentialsId: 'rcpoli-github-test', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_TOKEN')]) {
                     bat '''
-                    :: Define safe working folder
+                    :: Usar directorio seguro temporal
                     cd %WORKSPACE%
                     if exist deploy-temp rmdir /S /Q deploy-temp
 
-                    :: Clone gh-pages into deploy-temp
+                    :: Clona el repositorio gh-pages
                     git clone --branch gh-pages https://%GIT_USER%:%GIT_TOKEN%@github.com/rcpoli/web-gym-docker.git deploy-temp
 
-                    :: Clear old contents (except .git)
+                    :: Limpiar los archivos anteriores
                     cd deploy-temp
                     for /D %%D in (*) do if /I not "%%D"==".git" rmdir /S /Q "%%D"
                     for %%F in (*) do if /I not "%%F"==".git" del /Q "%%F"
 
-                    :: Copy frontend static files into deploy-temp
+                    :: Copia los archivos del frontend al directorio temporal
                     xcopy /E /Y /I "%WORKSPACE%\\Frontend\\*" .
 
-                    :: Commit and push
+                    :: Commit y push
                     git config user.email "jenkins@local"
                     git config user.name "%GIT_USER%"
                     git add .
