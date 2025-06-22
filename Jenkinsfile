@@ -47,9 +47,6 @@ pipeline {
         }
 
         stage('Deploy to GitHub Pages') {
-            when {
-                branch 'main'
-            }
             steps {
                 dir('Frontend') {
                     withCredentials([usernamePassword(credentialsId: 'rcpoli-github-test', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_TOKEN')]) {
