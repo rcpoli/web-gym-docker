@@ -52,7 +52,7 @@ pipeline {
             }
             steps {
                 dir('Frontend') {
-                    withCredentials([usernamePassword(credentialsId: 'github-creds', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_TOKEN')]) {
+                    withCredentials([usernamePassword(credentialsId: 'rcpoli-github-test', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_TOKEN')]) {
                         bat '''
                         :: Configure Git
                         git config --global user.email "jenkins@local"
